@@ -50,4 +50,6 @@ public class ProveedorEntity {
     @Column(name = "token_expiracion")
     private LocalDateTime tokenExpiracion;
 
+    
+
 }
