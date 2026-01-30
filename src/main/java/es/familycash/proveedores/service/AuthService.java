@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import es.familycash.proveedores.bean.LoginDataBean;
+import es.familycash.proveedores.config.RequestContext;
 import es.familycash.proveedores.entity.ProveedorEntity;
 import es.familycash.proveedores.entity.ProveedorEntityDes;
 import es.familycash.proveedores.exception.UnauthorizedAccessException;
@@ -24,15 +25,32 @@ public class AuthService {
     @Autowired
     HttpServletRequest oHttpServletRequest;
 
+    @Autowired
+    RequestContext requestContext;
+
     public boolean checkLogin(LoginDataBean loginData) {
-        return proveedorService.findById(loginData.getProveedorId())
+        String entorno = requestContext.getEntorno();
+        System.out.println("[AUTH] Intentando login para NIF: " + loginData.getNif() + ", ID: "
+                + loginData.getProveedorId() + " [Entorno: " + entorno + "]");
+
+        // Buscamos por NIF ya que es un String y evita problemas de casting con el ID
+        // (que es VARCHAR en DB)
+        return proveedorService.findByNif(loginData.getNif())
                 .filter(p -> {
                     if (p instanceof ProveedorEntity pe) {
-                        return pe.getNif().trim().equalsIgnoreCase(loginData.getNif().trim())
-                                && pe.getPassword().equals(loginData.getPassword());
+                        System.out.println("[AUTH] Proveedor PROD encontrado: " + pe.getDescripcion() + " (ID: "
+                                + pe.getId() + ")");
+                        boolean idMatches = pe.getId().equals(loginData.getProveedorId());
+                        boolean passMatches = pe.getPassword().equals(loginData.getPassword());
+                        System.out.println("[AUTH] Match - ID: " + idMatches + ", Password: " + passMatches);
+                        return idMatches && passMatches;
                     } else if (p instanceof ProveedorEntityDes pd) {
-                        return pd.getNif().trim().equalsIgnoreCase(loginData.getNif().trim())
-                                && pd.getPassword().equals(loginData.getPassword());
+                        System.out.println("[AUTH] Proveedor DES encontrado: " + pd.getDescripcion() + " (ID: "
+                                + pd.getId() + ")");
+                        boolean idMatches = pd.getId().equals(loginData.getProveedorId());
+                        boolean passMatches = pd.getPassword().equals(loginData.getPassword());
+                        System.out.println("[AUTH] Match - ID: " + idMatches + ", Password: " + passMatches);
+                        return idMatches && passMatches;
                     }
                     return false;
                 })
@@ -40,35 +58,37 @@ public class AuthService {
     }
 
     private Map<String, String> getClaims(Object proveedor) {
-    Map<String, String> claims = new HashMap<>();
+        Map<String, String> claims = new HashMap<>();
 
-    if (proveedor instanceof ProveedorEntity p) {
-        claims.put("nif", p.getNif());
-        claims.put("proveedorId", p.getId().toString());
-        claims.put("rol", p.getRol());
-    } else if (proveedor instanceof ProveedorEntityDes pd) {
-        claims.put("nif", pd.getNif());
-        claims.put("proveedorId", pd.getId().toString());
-        claims.put("rol", pd.getRol());
-    } else {
-        throw new RuntimeException("Tipo de proveedor no reconocido");
+        if (proveedor instanceof ProveedorEntity p) {
+            claims.put("nif", p.getNif());
+            claims.put("proveedorId", p.getId().toString());
+            claims.put("rol", p.getRol());
+        } else if (proveedor instanceof ProveedorEntityDes pd) {
+            claims.put("nif", pd.getNif());
+            claims.put("proveedorId", pd.getId().toString());
+            claims.put("rol", pd.getRol());
+        } else {
+            throw new RuntimeException("Tipo de proveedor no reconocido");
+        }
+
+        return claims;
     }
 
-    return claims;
-}
-
-
     public String getToken(String nif, Long proveedorId) {
-        Object proveedor = proveedorService.findById(proveedorId)
+        // Buscamos por NIF igual que en checkLogin para evitar problemas de casting del
+        // ID
+        Object proveedor = proveedorService.findByNif(nif)
                 .filter(p -> {
                     if (p instanceof ProveedorEntity pe) {
-                        return pe.getNif().trim().equalsIgnoreCase(nif.trim());
+                        return pe.getId().equals(proveedorId);
                     } else if (p instanceof ProveedorEntityDes pd) {
-                        return pd.getNif().trim().equalsIgnoreCase(nif.trim());
+                        return pd.getId().equals(proveedorId);
                     }
                     return false;
                 })
-                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ese NIF"));
+                .orElseThrow(() -> new RuntimeException(
+                        "Proveedor no encontrado con NIF: " + nif + " e ID: " + proveedorId));
 
         return JWTHelper.generateToken(getClaims(proveedor));
     }
