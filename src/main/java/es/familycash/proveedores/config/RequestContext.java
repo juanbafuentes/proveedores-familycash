@@ -12,8 +12,8 @@ public class RequestContext {
     private final String entorno;
 
     public RequestContext(HttpServletRequest request) {
-        String header = request.getHeader("X-Entorno");
-        this.entorno = (header != null && header.equalsIgnoreCase("dev")) ? "dev" : "prod";
+        // Forzamos siempre producción para eliminar el uso de tablas _DES
+        this.entorno = "prod";
     }
 
     public boolean isDev() {
