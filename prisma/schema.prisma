@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model LU_ARA {
+  ARA_ID           Decimal   @id @db.Decimal
+  ARA_DS           String?
+  ARA_DS_TIC       String?
+  ARA_DPT          Int?
+  ARA_FAM          Int?
+  ARA_SBF          Int?
+  ARA_MARCA        String?
+  ARA_UDM_ID       String?
+  ARA_UDM_CTD      Decimal?  @db.Decimal
+  ARA_CENT         String?
+  ARA_APESO        Int?
+  ARA_UC           Int?
+  ARA_US           Int?
+  ARA_PK           Int?
+  ARA_CAJAS_CAPA   Int?
+  ARA_CAJAS_PALET  Int?
+  ARA_PRO          String?
+  ARA_PRO_REF      String?
+  ARA_EAN          String?
+  ARA_EAN_C        String?
+  ARA_EAN_P        String?
+  ARA_LARGO_C      Int?
+  ARA_ANCHO_C      Int?
+  ARA_ALTO_C       Int?
+  ARA_PESO_C       Decimal?  @db.Decimal
+  ARA_DIAS_CAD     Int?
+  ARA_CEN          String?
+  ARA_IVA          String?
+  ARA_PVP          Decimal?  @db.Decimal
+  ARA_PVP_HOM      Decimal?  @db.Decimal
+  ARA_PVP_AND      Decimal?  @db.Decimal
+  ARA_PVP_CAT      Decimal?  @db.Decimal
+  ARA_PRO_TAR      Decimal?  @db.Decimal
+  ARA_PRO_FAC      String?
+  ARA_PRO_NETO     Decimal?  @db.Decimal
+  ARA_PRO_FFAC     String?
+  ARA_PRO_NETON    Decimal?  @db.Decimal
+  ARA_ART_MKD      String?
+  ARA_ART_SUST     String?
+  INSERT_BY        String?
+  INSERT_AT        DateTime? @db.Timestamp(6)
+  UPDATE_BY        String?
+  UPDATE_AT        DateTime? @db.Timestamp(6)
+  ARA_STATUS       Int?
+  ARA_OBS          String?
+  ARA_IMAGE        String?
+  ARA_PART_ARANCEL String?
+  ARA_PVP_MEL      Decimal?  @db.Decimal
+  PAIS_ORIGEN      String?
+}
+
+model LU_PRO {
+  ID_PRO     String @id
+  DS_PRO     String
+  QL_PRO_NIF String
+  ID_PRO_COM Int?
+  ID_PRO_GES Int?
+  PRO_PASSWD String
+
+
+}
+
+model PAISES {
+  id_pais     Int    @id
+  nombre_pais String
+  codigo_pais String
+}
+
+model producto_imagen {
+  id          BigInt @id
+  producto_id BigInt
+  imagenUrl   String?
+  imagen      Bytes?
+
+
+}

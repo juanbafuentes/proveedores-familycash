@@ -1,63 +1,36 @@
-# Proveedores Family Cash - API Backend
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Sistema de gestión de productos y documentación para proveedores de Family Cash.
+## Getting Started
 
-## 🚀 Tecnologías
+First, run the development server:
 
-- **Java 17**
-- **Spring Boot 3.2.3**
-- **Spring Data JPA**
-- **MySQL**
-- **JWT (JSON Web Token)** para seguridad.
-- **Apache Commons Net** para gestión de archivos via FTP.
-
-## 🛠️ Configuración del Entorno
-
-El sistema requiere las siguientes variables de configuración (definidas en `application.properties` o variables de entorno):
-
-```properties
-# Base de Datos
-spring.datasource.url=jdbc:mysql://[host]:[port]/[database]
-spring.datasource.username=[user]
-spring.datasource.password=[password]
-
-# Seguridad JWT
-jwt.secret=[tu_secreto_largo_y_seguro]
-jwt.issuer=familycash
-jwt.subject=proveedores
-
-# Servidor FTP (Almacenamiento de Imágenes y Documentos)
-ftp.host=[host_ftp]
-ftp.port=21
-ftp.user=[usuario_ftp]
-ftp.pass=[password_ftp]
-ftp.path=/www/assets/
-ftp.urlBase=https://proveedores.familycash.es/assets/
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-## 🏗️ Arquitectura de Entornos (Dev/Prod)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-El proyecto utiliza una arquitectura de enrutamiento dinámico basada en el header HTTP `X-Entorno`.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-- **Prod**: Valor por defecto o header `X-Entorno: prod`. Utiliza tablas estándar (e.g., `LU_ARA`).
-- **Dev**: Header `X-Entorno: dev`. Utiliza tablas de desarrollo (e.g., `LU_ARA_DES`).
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Esta lógica está encapsulada en la capa de servicios mediante "Routers" (e.g., `ProductoServiceRouter`).
+## Learn More
 
-## 🔐 Seguridad
+To learn more about Next.js, take a look at the following resources:
 
-La autenticación se realiza mediante el endpoint `/auth/login`, que valida NIF, ID de Proveedor y Contraseña.
-Tras un login exitoso, se devuelve un token JWT que debe incluirse en la cabecera `Authorization: Bearer [token]` para las peticiones protegidas.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 📁 Gestión de Archivos
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-- **Imágenes**: Se suben al servidor FTP en la ruta `/images/[entorno]/producto/[id]`.
-- **Documentos**: Se suben en la ruta `/docs/[entorno]/producto/[id]` con el formato de nombre `CODPROVEEDOR_EAN_TIPO.pdf`.
+## Deploy on Vercel
 
-## 📌 Endpoints Principales
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-- `POST /auth/login`: Autenticación.
-- `GET /producto`: Listado paginado de productos.
-- `GET /producto/pagebyproveedor`: Productos vinculados al proveedor autenticado.
-- `POST /producto/new`: Creación de producto con imágenes y documentos (Multipart).
-- `PUT /producto/update/{id}`: Actualización de producto.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
