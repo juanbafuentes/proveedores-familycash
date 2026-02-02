@@ -1,3 +1,4 @@
+import prisma from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
@@ -19,6 +20,13 @@ export default async function DashboardLayout({
     if (!session) {
         redirect('/login')
     }
+
+    // Fetch provider details to show name
+    const provider = await prisma.lU_PRO.findUnique({
+        where: { ID_PRO: session.value },
+        select: { DS_PRO: true }
+    })
+    const providerName = provider?.DS_PRO || 'Proveedor Desconocido'
 
     const navItems = [
         { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -74,7 +82,8 @@ export default async function DashboardLayout({
                 <div className="p-6 border-t border-border mt-auto">
                     <div className="bg-muted/50 rounded-2xl p-4 mb-4 border border-border/50">
                         <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1 text-center">Sesión Activa</p>
-                        <p className="text-xs font-bold text-center truncate">{session.value}</p>
+                        <p className="text-xs font-bold text-center truncate">{providerName}</p>
+                        <p className="text-[10px] text-muted-foreground text-center truncate">{session.value}</p>
                     </div>
                     <form action={async () => {
                         'use server'
